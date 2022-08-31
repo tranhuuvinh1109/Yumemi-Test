@@ -6,9 +6,8 @@ import { useEffect, useState } from 'react'
 import { getAllCountry, getPopulationOfTheCountry } from './api';
 function App() {
   const [countries, setCountries] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState()
   const [options, setOptions] = useState()
-  const [data, setData] = useState()
 
   useEffect(() => {
     getAllCountry()
@@ -27,42 +26,40 @@ function App() {
   }, [])
 
   useEffect(() => {
-    let arr = []
-    selectedCountry.forEach((e) => {
+    if (selectedCountry) {
 
-      getPopulationOfTheCountry(e).then(
+      getPopulationOfTheCountry(selectedCountry).then(
         (res) => {
-          const pop = res.data.result.data[0].data
+          if (res) {
+            console.log(res);
+            const pop = res.data.result.data[0].data
 
-          const countrySelected = countries.find(
-            (country) => country.prefCode == e
-          );
-          console.log('cooo', countries)
-          const value2 = {
-            data: pop.map((ele) => ele.value),
-            name: countrySelected.prefName
+            const countrySelected = countries.find(
+              (country) => country.prefCode == selectedCountry
+            );
+            console.log('cooo', countries)
+            const value2 = {
+              data: pop.map((ele) => ele.value),
+              name: countrySelected.prefName
+            }
+            setOptions(value2)
           }
-          arr.push(value2)
         }
-
       )
-    })
-    setOptions(arr)
+    }
+
   }, [selectedCountry])
 
 
 
   const handleOnChange = (e) => {
-    console.log('0-', options);
-    console.log(e);
-    const value = e.target.value
-    console.log('1->', selectedCountry);
+    // const value = e.target.value
     if (e.target.checked === true) {
-      setSelectedCountry([...selectedCountry, value])
+      // setSelectedCountry([...selectedCountry, value])
+      setSelectedCountry(e.target.value)
     } else {
-      setSelectedCountry(selectedCountry.filter(item => item !== value))
+      // setSelectedCountry(selectedCountry.filter(item => item !== value))
     }
-    console.log('2->', selectedCountry);
   }
 
   const handleOnClick = () => {
@@ -73,7 +70,7 @@ function App() {
 
   return (
     <div className="App">
-      <CountrySelector country={countries} handleOnChange={handleOnChange} handleOnClick={handleOnClick} />
+      <CountrySelector country={countries} selectedCountry={selectedCountry} handleOnChange={handleOnChange} handleOnClick={handleOnClick} />
       <Chart data={options} />
     </div>
   );

@@ -4,21 +4,6 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 
-const convertOptions = (data) => {
-    return {
-        chart: {
-            type: 'spline'
-        },
-        title: {
-            text: '人口チャート'
-        },
-        xAxis: {
-            categories: [1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030, 2035, 2040, 2045]
-        },
-        series: data
-    }
-}
-
 
 function Chart({ data }) {
     const chartComponent = useRef(null);
@@ -35,7 +20,12 @@ function Chart({ data }) {
                 xAxis: {
                     categories: [1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030, 2035, 2040, 2045]
                 },
-                series: data
+                yAxis: [{
+                    title: {
+                        text: '総人口'
+                    }
+                },],
+                series: data,
             })
         console.log(data)
     }, [data])
