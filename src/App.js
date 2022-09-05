@@ -6,8 +6,9 @@ import { useEffect, useState } from 'react'
 import { getAllCountry, getPopulationOfTheCountry } from './api';
 function App() {
   const [countries, setCountries] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState()
-  const [options, setOptions] = useState()
+  const [checkeCountry, setCheckeCountry] = useState([])
+  const [clickedCountry, setClickedCountry] = useState()
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
     getAllCountry()
@@ -26,51 +27,54 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (selectedCountry) {
+    const hanldeGetData = async () => {
+      if (checkeCountry.filter(e => e.prefCode === clickedCountry.prefCode).length > 0) {
+        const res = await getPopulationOfTheCountry(clickedCountry.prefCode, clickedCountry.prefName)
 
-      getPopulationOfTheCountry(selectedCountry).then(
-        (res) => {
-          if (res) {
-            console.log(res);
-            const pop = res.data.result.data[0].data
+        setOptions((pre) => [...pre, res])
 
-            const countrySelected = countries.find(
-              (country) => country.prefCode == selectedCountry
-            );
-            console.log('cooo', countries)
-            const value2 = {
-              data: pop.map((ele) => ele.value),
-              name: countrySelected.prefName
-            }
-            setOptions(value2)
-          }
-        }
-      )
+      } else {
+        setOptions((pre) =>
+          pre.filter(
+            (option) => option.prefCode !== clickedCountry.prefCode
+          )
+
+        )
+      }
+
     }
+    hanldeGetData()
 
-  }, [selectedCountry])
+  }, [checkeCountry])
 
 
 
-  const handleOnChange = (e) => {
-    // const value = e.target.value
-    if (e.target.checked === true) {
-      // setSelectedCountry([...selectedCountry, value])
-      setSelectedCountry(e.target.value)
-    } else {
-      // setSelectedCountry(selectedCountry.filter(item => item !== value))
-    }
-  }
+  const handleOnChange = (id, name) => {
+    // const value = e.target.valu
+    console.log(id, name);
+    setClickedCountry({
+      prefCode: id,
+      prefName: name
+    });
+    setCheckeCountry((pre) => {
+      if (checkeCountry.filter(e => e.prefCode === id).length > 0) {
+        return checkeCountry.filter((item) => item.prefCode !== id)
+      } else {
+        return [...pre, {
+          prefCode: id,
+          prefName: name
+        }]
+      }
 
-  const handleOnClick = () => {
-    setSelectedCountry([])
+    })
+    console.log('s', checkeCountry);
   }
 
 
 
   return (
     <div className="App">
-      <CountrySelector country={countries} selectedCountry={selectedCountry} handleOnChange={handleOnChange} handleOnClick={handleOnClick} />
+      <CountrySelector country={countries} checkeCountry={checkeCountry} handleOnChange={handleOnChange} />
       <Chart data={options} />
     </div>
   );
